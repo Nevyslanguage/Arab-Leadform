@@ -1,0 +1,178 @@
+<div class="lead-form-container">
+  <!-- Header with Logo -->
+  <div class="header pt-10">
+    <img src="assets/images/NevysLogo_Digital-02.png" alt="NEVY'S LANGUAGE" class="logo">
+  </div>
+
+  <!-- Introduction Text -->
+  <div class="intro-text">
+    <h2 class="main-description">
+      منذ 2017 ونحن نصنع فرقًا حقيقيًا في حياة آلاف الأشخاص حول العالم، نساعدهم على تعلم الإنجليزية بثقة ومتعة 🌍✨ مقرنا في تورنتو، وساعدنا أكثر من 5000 متعلم من الولايات المتحدة وكندا ودول عديدة، في مجموعات تفاعلية مليئة بالحماس والدعم.
+    </h2>
+    <p class="instruction-text my-4">
+      يرجى ملء هذا النموذج حتى يتمكن وكلاء التسجيل لدينا من الاتصال بك وتزويدك بكل المعلومات التي تحتاجها.
+    </p>
+  </div>
+
+  <!-- Lead Form -->
+  <form class="lead-form" [formGroup]="leadForm" (ngSubmit)="onSubmit()">
+    
+    <!-- English Lessons History -->
+    <div class="form-group">
+      <label class="form-label">هل سبق لك أن أخذت دروس في اللغة الإنجليزية من قبل؟*</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" formControlName="englishLessonsHistory" value="yes" class="radio-input">
+          <span class="radio-text">نعم</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="englishLessonsHistory" value="no" class="radio-input">
+          <span class="radio-text">لا</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Level Assessment Preference -->
+    <div class="form-group">
+      <label class="form-label">هل تفضل أن تأخذ اختباراً لتحديد مستواك، أم تريد أن تبدأ التعلم من الصفر بسهولة؟*</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" formControlName="levelPreference" value="test" class="radio-input">
+          <span class="radio-text">أريد أن أختبر مستواي</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="levelPreference" value="beginner" class="radio-input">
+          <span class="radio-text">أريد أن أبدأ من الصفر</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="form-group">
+      <label class="form-label">في أي وقت تكون متاحًا؟*</label>
+      <div class="radio-group availability-group">
+        <label class="radio-label">
+          <input type="radio" formControlName="availability" value="morning" class="radio-input">
+          <span class="radio-text">صباحًا 11 - 9</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="availability" value="afternoon1" class="radio-input">
+          <span class="radio-text">ظهرا 2 - 11</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="availability" value="afternoon2" class="radio-input">
+          <span class="radio-text">مساءً 5 - 2</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="availability" value="evening" class="radio-input">
+          <span class="radio-text">مساءً 9 - 5</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Specific Time Slots -->
+    <div class="form-group" *ngIf="selectedTimeSlots.length > 0">
+      <label class="form-label">لكي نتمكن من الاتصال بك في أفضل وقت، يرجى اختيار فترة زمنية محددة ضمن النطاق الذي اخترته: *</label>
+      <div class="radio-group specific-time-slots">
+        <label class="radio-label" *ngFor="let slot of selectedTimeSlots">
+          <input type="radio" formControlName="specificTimeSlot" [value]="slot.value" class="radio-input" dir="rtl">
+          <span class="radio-text" [innerHTML]="slot.label"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Name Input -->
+    <div class="form-group">
+      <label class="form-label">اسمك*</label>
+      <input type="text" formControlName="name" class="form-input" required>
+    </div>
+
+    <!-- Phone Number -->
+    <div class="form-group">
+      <label class="form-label">رقم هاتفك (احذر من ارتكاب أي خطأ!) ⚠️*</label>
+      <input type="tel" formControlName="phone" class="form-input english-input" placeholder="+1 (xxx) XXX-XXXX">
+    </div>
+
+    <!-- WhatsApp Confirmation -->
+    <div class="form-group">
+      <label class="form-label">هل رقم هاتفك هو نفسه رقمك على واتساب ؟*</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" formControlName="whatsappSame" value="yes" class="radio-input">
+          <span class="radio-text">نعم</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" formControlName="whatsappSame" value="no" class="radio-input">
+          <span class="radio-text">لا</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- WhatsApp Number Input (conditional) -->
+    <div class="form-group" *ngIf="leadForm.get('whatsappSame')?.value === 'no'">
+      <label class="form-label">يرجى إدخال رقم واتساب الخاص بك مبتدئا برمز الدولة و بدون أي فراغات بين الأرقام (مثال: (+963XXXXXXXXX)*</label>
+      <input type="tel" formControlName="whatsappNumber" class="form-input english-input" placeholder="+963XXXXXXXXX">
+      <div class="warning-message">
+        <span class="warning-icon">⚠️</span>
+        <span class="warning-text">يرجى عدم ارتكاب أي خطأ، وإلا فلن نتمكن من التواصل معك</span>
+      </div>
+    </div>
+
+    <!-- Email Address -->
+    <div class="form-group">
+      <label class="form-label">عنوان البريد الإلكتروني*</label>
+      <input type="email" formControlName="email" class="form-input" required>
+      <p class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</p>
+    </div>
+
+    <!-- Province -->
+    <div class="form-group">
+      <p class="province-intro">نود أن نعرف من أين يأتي طلابنا المحتملون 😊</p>
+      <label class="form-label">المقاطعة*</label>
+      <select formControlName="province" class="form-select" required>
+        <option value="">...Select ✓</option>
+        <option value="ontario">أونتاريو</option>
+        <option value="quebec">كيبيك</option>
+        <option value="british-columbia">كولومبيا البريطانية</option>
+        <option value="alberta">ألبرتا</option>
+        <option value="manitoba">مانيتوبا</option>
+        <option value="saskatchewan">ساسكاتشوان</option>
+        <option value="nova-scotia">نوفا سكوشا</option>
+        <option value="new-brunswick">نيو برونزويك</option>
+        <option value="newfoundland">نيوفاوندلاند ولابرادور</option>
+        <option value="prince-edward-island">جزيرة الأمير إدوارد</option>
+        <option value="northwest-territories">الأقاليم الشمالية الغربية</option>
+        <option value="nunavut">نونافوت</option>
+        <option value="yukon">يوكون</option>
+      </select>
+    </div>
+
+    <!-- Campaign Tracking Fields -->
+    <div class="form-group">
+      <label class="form-label english-label">Campaign Name*</label>
+      <input type="text" formControlName="campaignName" class="form-input english-input" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label english-label">Adset Name*</label>
+      <input type="text" formControlName="adsetName" class="form-input english-input" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label english-label">Ad Name*</label>
+      <input type="text" formControlName="adName" class="form-input english-input" required>
+  </div>
+
+    <div class="form-group">
+      <label class="form-label english-label">FB CLICK ID*</label>
+      <input type="text" formControlName="fbClickId" class="form-input english-input" required>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="submit-button" [disabled]="leadForm.invalid">
+      إرسال النموذج
+    </button>
+  </form>
+</div>
+
+<router-outlet />

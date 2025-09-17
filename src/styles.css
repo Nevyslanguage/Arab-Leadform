@@ -1,0 +1,23 @@
+/* Arabic Font Support */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles for Arabic Support */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans Arabic', 'Arial', sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+html {
+  direction: rtl;
+}
