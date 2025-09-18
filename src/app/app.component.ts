@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
+  imports: [RouterOutlet, ReactiveFormsModule, CommonModule, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'arableadform';
   leadForm: FormGroup;
   selectedTimeSlots: any[] = [];
@@ -50,7 +51,7 @@ export class AppComponent {
     ]
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.leadForm = this.fb.group({
       englishLessonsHistory: ['', Validators.required],
       levelPreference: ['', Validators.required],
@@ -62,10 +63,10 @@ export class AppComponent {
       whatsappNumber: [''],
       email: ['', [Validators.required, Validators.email]],
       province: ['', Validators.required],
-      campaignName: ['', Validators.required],
-      adsetName: ['', Validators.required],
-      adName: ['', Validators.required],
-      fbClickId: ['', Validators.required]
+      campaignName: [''],
+      adsetName: [''],
+      adName: [''],
+      fbClickId: ['']
     });
 
    //changes in availability to update time slots
@@ -78,6 +79,37 @@ export class AppComponent {
     // Listen for changes in WhatsApp same as phone to update validation
     this.leadForm.get('whatsappSame')?.valueChanges.subscribe(value => {
       this.updateWhatsAppValidation(value);
+    });
+  }
+
+  ngOnInit() {
+    this.extractUrlParameters();
+  }
+
+  extractUrlParameters() {
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Extract Facebook campaign parameters
+    const campaignName = urlParams.get('Campaign_name') || urlParams.get('campaign_name') || '';
+    const adsetName = urlParams.get('Adset_name') || urlParams.get('adset_name') || '';
+    const adName = urlParams.get('Ad_name') || urlParams.get('ad_name') || '';
+    const fbClickId = urlParams.get('fbclid') || '';
+    
+    // Auto-populate the hidden form fields
+    this.leadForm.patchValue({
+      campaignName: campaignName,
+      adsetName: adsetName,
+      adName: adName,
+      fbClickId: fbClickId
+    });
+    
+    // Log for debugging (remove in production)
+    console.log('Facebook Campaign Parameters:', {
+      campaignName,
+      adsetName,
+      adName,
+      fbClickId
     });
   }
 
@@ -107,10 +139,81 @@ export class AppComponent {
     if (this.leadForm.valid) {
       console.log('Form submitted:', this.leadForm.value);
       
-      alert('تم إرسال النموذج بنجاح!');
+      // Get form values
+      const formData = this.leadForm.value;
+      
+      // Send data to Zapier webhook
+      this.sendToZapier(formData);
+      
     } else {
       console.log('Form is invalid');
       alert('يرجى ملء جميع الحقول المطلوبة');
     }
+  }
+
+  sendToZapier(formData: any) {
+    // Replace this URL with your actual Zapier webhook URL
+    const zapierWebhookUrl = 'YOUR_ZAPIER_WEBHOOK_URL_HERE';
+    
+    // Prepare data for Zapier
+    const zapierData = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      whatsappSame: formData.whatsappSame,
+      whatsappNumber: formData.whatsappNumber,
+      englishLessonsHistory: formData.englishLessonsHistory,
+      levelPreference: formData.levelPreference,
+      availability: formData.availability,
+      specificTimeSlot: formData.specificTimeSlot,
+      province: formData.province,
+      // Facebook campaign tracking data
+      campaignName: formData.campaignName,
+      adsetName: formData.adsetName,
+      adName: formData.adName,
+      fbClickId: formData.fbClickId,
+      // Timestamp
+      submittedAt: new Date().toISOString()
+    };
+
+    // Send to Zapier
+    this.http.post(zapierWebhookUrl, zapierData).subscribe({
+      next: (response) => {
+        console.log('Data sent to Zapier successfully:', response);
+        
+        // Build confirmation URL with Facebook campaign parameters
+        const confirmationUrl = this.buildConfirmationUrl(formData);
+        
+        // Redirect to confirmation page
+        window.location.href = confirmationUrl;
+      },
+      error: (error) => {
+        console.error('Error sending to Zapier:', error);
+        
+        // Even if Zapier fails, still redirect to confirmation page
+        const confirmationUrl = this.buildConfirmationUrl(formData);
+        window.location.href = confirmationUrl;
+      }
+    });
+  }
+
+  buildConfirmationUrl(formData: any): string {
+    // Base confirmation URL
+    const baseUrl = 'https://arabconfirmationpage.netlify.app/';
+    
+    // Get form data and Facebook campaign parameters
+    const name = encodeURIComponent(formData.name || '');
+    const email = encodeURIComponent(formData.email || '');
+    const campaignName = encodeURIComponent(formData.campaignName || '');
+    const adsetName = encodeURIComponent(formData.adsetName || '');
+    const adName = encodeURIComponent(formData.adName || '');
+    const fbClickId = encodeURIComponent(formData.fbClickId || '');
+    
+    // Build URL with parameters
+    const confirmationUrl = `${baseUrl}?name=${name}&email=${email}&Campaign_name=${campaignName}&Adset_name=${adsetName}&Ad_name=${adName}&fbclid=${fbClickId}`;
+    
+    console.log('Redirecting to confirmation URL:', confirmationUrl);
+    
+    return confirmationUrl;
   }
 }

@@ -147,26 +147,11 @@
       </select>
     </div>
 
-    <!-- Campaign Tracking Fields -->
-    <div class="form-group">
-      <label class="form-label english-label">Campaign Name*</label>
-      <input type="text" formControlName="campaignName" class="form-input english-input" required>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label english-label">Adset Name*</label>
-      <input type="text" formControlName="adsetName" class="form-input english-input" required>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label english-label">Ad Name*</label>
-      <input type="text" formControlName="adName" class="form-input english-input" required>
-  </div>
-
-    <div class="form-group">
-      <label class="form-label english-label">FB CLICK ID*</label>
-      <input type="text" formControlName="fbClickId" class="form-input english-input" required>
-    </div>
+    <!-- Hidden Campaign Tracking Fields (auto-populated from URL) -->
+    <input type="hidden" formControlName="campaignName">
+    <input type="hidden" formControlName="adsetName">
+    <input type="hidden" formControlName="adName">
+    <input type="hidden" formControlName="fbClickId">
 
     <!-- Submit Button -->
     <button type="submit" class="submit-button" [disabled]="leadForm.invalid">
