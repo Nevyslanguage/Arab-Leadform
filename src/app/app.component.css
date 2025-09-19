@@ -63,7 +63,7 @@ html, body {
 /* Form Styles */
 .lead-form {
   max-width: 600px;
-  margin: 0 5px;
+  margin: 0 auto;
   background-color: white;
   padding: 30px;
   border-radius: 10px;
