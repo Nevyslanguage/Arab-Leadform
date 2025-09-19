@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ReactiveFormsModule, CommonModule, HttpClientModule],
+  imports: [RouterOutlet, ReactiveFormsModule, FormsModule, CommonModule, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -15,6 +15,62 @@ export class AppComponent implements OnInit {
   title = 'arableadform';
   leadForm: FormGroup;
   selectedTimeSlots: any[] = [];
+  selectedCountryCode = '+963'; // Default to Syria
+  showCountryDropdown = false;
+  countrySearchTerm = '';
+  filteredCountries: any[] = [];
+
+  countryCodes = [
+    { code: '+1', country: 'Canada/USA', flag: '🇨🇦' },
+    { code: '+44', country: 'UK', flag: '🇬🇧' },
+    { code: '+33', country: 'France', flag: '🇫🇷' },
+    { code: '+49', country: 'Germany', flag: '🇩🇪' },
+    { code: '+39', country: 'Italy', flag: '🇮🇹' },
+    { code: '+34', country: 'Spain', flag: '🇪🇸' },
+    { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+    { code: '+46', country: 'Sweden', flag: '🇸🇪' },
+    { code: '+47', country: 'Norway', flag: '🇳🇴' },
+    { code: '+45', country: 'Denmark', flag: '🇩🇰' },
+    { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+    { code: '+43', country: 'Austria', flag: '🇦🇹' },
+    { code: '+32', country: 'Belgium', flag: '🇧🇪' },
+    { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+    { code: '+30', country: 'Greece', flag: '🇬🇷' },
+    { code: '+90', country: 'Turkey', flag: '🇹🇷' },
+    { code: '+7', country: 'Russia', flag: '🇷🇺' },
+    { code: '+86', country: 'China', flag: '🇨🇳' },
+    { code: '+81', country: 'Japan', flag: '🇯🇵' },
+    { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+    { code: '+91', country: 'India', flag: '🇮🇳' },
+    { code: '+61', country: 'Australia', flag: '🇦🇺' },
+    { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+    { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+    { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+    { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+    { code: '+56', country: 'Chile', flag: '🇨🇱' },
+    { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+    { code: '+51', country: 'Peru', flag: '🇵🇪' },
+    { code: '+58', country: 'Venezuela', flag: '🇻🇪' },
+    { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+    { code: '+20', country: 'Egypt', flag: '🇪🇬' },
+    { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
+    { code: '+971', country: 'UAE', flag: '🇦🇪' },
+    { code: '+965', country: 'Kuwait', flag: '🇰🇼' },
+    { code: '+973', country: 'Bahrain', flag: '🇧🇭' },
+    { code: '+974', country: 'Qatar', flag: '🇶🇦' },
+    { code: '+968', country: 'Oman', flag: '🇴🇲' },
+    { code: '+962', country: 'Jordan', flag: '🇯🇴' },
+    { code: '+961', country: 'Lebanon', flag: '🇱🇧' },
+    { code: '+963', country: 'Syria', flag: '🇸🇾' },
+    { code: '+964', country: 'Iraq', flag: '🇮🇶' },
+    { code: '+98', country: 'Iran', flag: '🇮🇷' },
+    { code: '+92', country: 'Pakistan', flag: '🇵🇰' },
+    { code: '+880', country: 'Bangladesh', flag: '🇧🇩' },
+    { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
+    { code: '+977', country: 'Nepal', flag: '🇳🇵' },
+    { code: '+975', country: 'Bhutan', flag: '🇧🇹' },
+    { code: '+93', country: 'Afghanistan', flag: '🇦🇫' }
+  ];
 
   timeSlots = {
     morning: [
@@ -58,10 +114,10 @@ export class AppComponent implements OnInit {
       availability: ['', Validators.required],
       specificTimeSlot: ['', Validators.required],
       name: ['', Validators.required],
-      phone: [''],
+      phone: ['', [Validators.required, this.canadianPhoneValidator]],
       whatsappSame: ['', Validators.required],
       whatsappNumber: [''],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, this.emailValidator]],
       province: ['', Validators.required],
       campaignName: [''],
       adsetName: [''],
@@ -84,6 +140,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.extractUrlParameters();
+    // Ensure the country code display is properly initialized
+    this.selectedCountryCode = '+963'; // Default to Syria
   }
 
   extractUrlParameters() {
@@ -161,7 +219,7 @@ export class AppComponent implements OnInit {
       email: formData.email,
       phone: formData.phone,
       whatsappSame: formData.whatsappSame,
-      whatsappNumber: formData.whatsappNumber,
+      whatsappNumber: formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : formData.phone,
       englishLessonsHistory: formData.englishLessonsHistory,
       levelPreference: formData.levelPreference,
       availability: formData.availability,
@@ -215,5 +273,190 @@ export class AppComponent implements OnInit {
     console.log('Redirecting to confirmation URL:', confirmationUrl);
     
     return confirmationUrl;
+  }
+
+  // Email validator
+  emailValidator(control: any) {
+    if (!control.value) {
+      return null;
+    }
+    
+    const email = control.value.trim();
+    
+    // Basic email regex pattern
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    // Check for common invalid patterns
+    const invalidPatterns = [
+      /^[^@]*$/, // No @ symbol
+      /@[^.]*$/, // No dot after @
+      /^@/, // Starts with @
+      /@$/, // Ends with @
+      /\.{2,}/, // Multiple consecutive dots
+      /^\./, // Starts with dot
+      /\.$/, // Ends with dot
+      /@.*@/, // Multiple @ symbols
+      /\s/ // Contains spaces
+    ];
+    
+    // Check if email matches basic pattern
+    if (!emailPattern.test(email)) {
+      return { invalidEmail: true };
+    }
+    
+    // Check for invalid patterns
+    for (const pattern of invalidPatterns) {
+      if (pattern.test(email)) {
+        return { invalidEmail: true };
+      }
+    }
+    
+    // Check for common disposable email domains
+    const disposableDomains = [
+      '10minutemail.com', 'tempmail.org', 'guerrillamail.com', 'mailinator.com',
+      'temp-mail.org', 'throwaway.email', 'getnada.com', 'maildrop.cc'
+    ];
+    
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (disposableDomains.includes(domain)) {
+      return { invalidEmail: true };
+    }
+    
+    return null; // Valid email
+  }
+
+  // Canadian phone number validator
+  canadianPhoneValidator(control: any) {
+    if (!control.value) {
+      return null;
+    }
+    
+    // Remove all non-digit characters
+    const phoneNumber = control.value.replace(/\D/g, '');
+    
+    // Canadian phone numbers should be 10 digits (without country code)
+    if (phoneNumber.length === 10) {
+      // Check if it starts with valid Canadian area codes
+      const validAreaCodes = [
+        '204', '226', '236', '249', '250', '263', '289', '306', '343', '354', '365', '367', '368', '382', '387', '403', '416', '418', '428', '431', '437', '438', '450', '468', '474', '506', '514', '519', '548', '579', '581', '584', '587', '604', '613', '639', '647', '672', '683', '705', '709', '742', '753', '778', '780', '782', '807', '819', '825', '867', '873', '879', '902', '905'
+      ];
+      
+      const areaCode = phoneNumber.substring(0, 3);
+      if (validAreaCodes.includes(areaCode)) {
+        return null; // Valid Canadian phone number
+      }
+    }
+    
+    return { invalidCanadianPhone: true };
+  }
+
+  // Format phone number as user types
+  formatPhoneNumber(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+    
+    if (value.length >= 6) {
+      value = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6, 10);
+    } else if (value.length >= 3) {
+      value = value.substring(0, 3) + '-' + value.substring(3);
+    }
+    
+    this.leadForm.get('phone')?.setValue(value, { emitEvent: false });
+  }
+
+  // Format WhatsApp number as user types
+  formatWhatsAppNumber(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+    
+    // Limit to reasonable length (15 digits max for international numbers)
+    if (value.length > 15) {
+      value = value.substring(0, 15);
+    }
+    
+    this.leadForm.get('whatsappNumber')?.setValue(value, { emitEvent: false });
+  }
+
+  // Get full WhatsApp number with country code
+  getFullWhatsAppNumber(): string {
+    const countryCode = this.selectedCountryCode;
+    const number = this.leadForm.get('whatsappNumber')?.value || '';
+    return countryCode + number;
+  }
+
+  // Format email (trim and lowercase)
+  formatEmail(event: any) {
+    const email = event.target.value.trim().toLowerCase();
+    this.leadForm.get('email')?.setValue(email, { emitEvent: false });
+  }
+
+  // Get the flag for the selected country code
+  getSelectedCountryFlag(): string {
+    const selectedCountry = this.countryCodes.find(country => country.code === this.selectedCountryCode);
+    return selectedCountry ? selectedCountry.flag : '🇸🇾';
+  }
+
+  // Toggle country dropdown
+  toggleCountryDropdown() {
+    this.showCountryDropdown = !this.showCountryDropdown;
+    if (this.showCountryDropdown) {
+      this.filteredCountries = [...this.countryCodes];
+      this.countrySearchTerm = '';
+    }
+    console.log('Dropdown toggled, showCountryDropdown:', this.showCountryDropdown);
+  }
+
+  // Select a country
+  selectCountry(country: any) {
+    this.selectedCountryCode = country.code;
+    this.showCountryDropdown = false;
+    this.countrySearchTerm = '';
+    console.log('Country selected:', country);
+  }
+
+  // Filter countries based on search term - optimized for speed
+  filterCountries() {
+    const searchTerm = this.countrySearchTerm?.trim() || '';
+    
+    // If search is empty, show all countries immediately
+    if (!searchTerm) {
+      this.filteredCountries = [...this.countryCodes];
+      return;
+    }
+    
+    // Fast filtering with lowercase search term
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    this.filteredCountries = this.countryCodes.filter(country => 
+      country.country.toLowerCase().includes(lowerSearchTerm) ||
+      country.code.includes(searchTerm) ||
+      country.flag.includes(searchTerm)
+    );
+  }
+
+  // Handle search input with real-time filtering
+  onCountrySearch(event: any) {
+    this.countrySearchTerm = event.target.value;
+    // Immediate filtering for fast response
+    this.filterCountries();
+  }
+
+  // Handle when search input is cleared
+  onSearchClear() {
+    this.countrySearchTerm = '';
+    this.filterCountries();
+  }
+
+  // Handle country code change (legacy method)
+  onCountryCodeChange() {
+    // This method is called when the country code dropdown changes
+    // The flag and country code will automatically update due to two-way binding
+    console.log('Country code changed to:', this.selectedCountryCode);
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.whatsapp-prefix-container')) {
+      this.showCountryDropdown = false;
+    }
   }
 }

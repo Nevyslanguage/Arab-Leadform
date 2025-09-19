@@ -89,8 +89,19 @@
 
     <!-- Phone Number -->
     <div class="form-group">
-      <label class="form-label">رقم هاتفك (احذر من ارتكاب أي خطأ!) ⚠️*</label>
-      <input type="tel" formControlName="phone" class="form-input english-input" placeholder="+1 (xxx) XXX-XXXX">
+      <label class="form-label">رقم هاتفك الكندي (احذر من ارتكاب أي خطأ!) ⚠️*</label>
+      <div class="phone-input-container">
+        <div class="phone-prefix">
+          <span class="flag">🇨🇦</span>
+          <span class="country-code">+1</span>
+        </div>
+        <input type="tel" formControlName="phone" class="form-input english-input phone-number-input" placeholder="(xxx) xxx-xxxx" (input)="formatPhoneNumber($event)">
+      </div>
+      <div class="form-note">يرجى إدخال رقم هاتف كندي صحيح (10 أرقام)</div>
+      <div *ngIf="leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched" class="error-message">
+        <span *ngIf="leadForm.get('phone')?.errors?.['required']">رقم الهاتف مطلوب</span>
+        <span *ngIf="leadForm.get('phone')?.errors?.['invalidCanadianPhone']">يرجى إدخال رقم هاتف كندي صحيح</span>
+      </div>
     </div>
 
     <!-- WhatsApp Confirmation -->
@@ -110,8 +121,47 @@
 
     <!-- WhatsApp Number Input (conditional) -->
     <div class="form-group" *ngIf="leadForm.get('whatsappSame')?.value === 'no'">
-      <label class="form-label">يرجى إدخال رقم واتساب الخاص بك مبتدئا برمز الدولة و بدون أي فراغات بين الأرقام (مثال: (+963XXXXXXXXX)*</label>
-      <input type="tel" formControlName="whatsappNumber" class="form-input english-input" placeholder="+963XXXXXXXXX">
+      <label class="form-label">يرجى إدخال رقم واتساب الخاص بك*</label>
+      <div class="whatsapp-input-container">
+        <div class="whatsapp-prefix-container">
+          <div class="whatsapp-prefix" (click)="toggleCountryDropdown()">
+            <span class="flag">{{ getSelectedCountryFlag() }}</span>
+            <span class="country-code">{{ selectedCountryCode }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="country-dropdown" *ngIf="showCountryDropdown">
+            <div class="country-search-container">
+              <input type="text" 
+                     class="country-search-input" 
+                     placeholder="البحث عن الدول..." 
+                     [(ngModel)]="countrySearchTerm"
+                     (input)="onCountrySearch($event)"
+                     (keyup)="onCountrySearch($event)"
+                     (paste)="onCountrySearch($event)"
+                     (click)="$event.stopPropagation()">
+              <button type="button" 
+                      class="clear-search-btn" 
+                      *ngIf="countrySearchTerm"
+                      (click)="onSearchClear()"
+                      (click)="$event.stopPropagation()">
+                ✕
+              </button>
+            </div>
+            <div class="country-options-container">
+              <div class="country-option" *ngFor="let country of filteredCountries" (click)="selectCountry(country)">
+                <span class="flag">{{ country.flag }}</span>
+                <span class="country-code">{{ country.code }}</span>
+                <span class="country-name">{{ country.country }}</span>
+              </div>
+              <div class="no-results" *ngIf="filteredCountries.length === 0 && countrySearchTerm">
+                <span>لم يتم العثور على دول لـ "{{ countrySearchTerm }}"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="tel" formControlName="whatsappNumber" class="form-input english-input whatsapp-number-input" placeholder="رقم الهاتف بدون رمز الدولة" (input)="formatWhatsAppNumber($event)">
+      </div>
+      <div class="form-note">الرقم الكامل: {{ selectedCountryCode }}{{ leadForm.get('whatsappNumber')?.value || 'رقم الهاتف' }}</div>
       <div class="warning-message">
         <span class="warning-icon">⚠️</span>
         <span class="warning-text">يرجى عدم ارتكاب أي خطأ، وإلا فلن نتمكن من التواصل معك</span>
@@ -121,8 +171,13 @@
     <!-- Email Address -->
     <div class="form-group">
       <label class="form-label">عنوان البريد الإلكتروني*</label>
-      <input type="email" formControlName="email" class="form-input" required>
-      <p class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</p>
+      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" (blur)="formatEmail($event)" required>
+      <div class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</div>
+      <div *ngIf="leadForm.get('email')?.invalid && leadForm.get('email')?.touched" class="error-message">
+        <span *ngIf="leadForm.get('email')?.errors?.['required']">البريد الإلكتروني مطلوب</span>
+        <span *ngIf="leadForm.get('email')?.errors?.['email']">يرجى إدخال بريد إلكتروني صحيح</span>
+        <span *ngIf="leadForm.get('email')?.errors?.['invalidEmail']">يرجى إدخال بريد إلكتروني صحيح</span>
+      </div>
     </div>
 
     <!-- Province -->
