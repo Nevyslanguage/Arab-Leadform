@@ -211,7 +211,8 @@ export class AppComponent implements OnInit {
 
   sendToZapier(formData: any) {
     // Your actual Zapier webhook URL
-    const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umntccj/';
+    // const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umntccj/';
+    const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umnlz2j/';
     
     // Prepare data for Zapier in clean JSON format
     const zapierData = {
