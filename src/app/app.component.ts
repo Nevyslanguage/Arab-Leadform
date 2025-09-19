@@ -211,54 +211,110 @@ export class AppComponent implements OnInit {
 
   sendToZapier(formData: any) {
     // Your actual Zapier webhook URL
-    // const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umntccj/';
     const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umnlz2j/';
     
-    // Prepare data for Zapier in clean JSON format
-    const zapierData = {
-      name: formData.name || '',
-      email: formData.email || '',
-      phone: formData.phone || '',
-      whatsappSame: formData.whatsappSame || '',
-      whatsappNumber: formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : (formData.phone || ''),
-      englishLessonsHistory: formData.englishLessonsHistory || '',
-      levelPreference: formData.levelPreference || '',
-      availability: formData.availability || '',
-      specificTimeSlot: formData.specificTimeSlot || '',
-      province: formData.province || '',
+    try {
+      // Create URL parameters for the webhook (matching successful pattern)
+      const params = new URLSearchParams();
+      
+      // Basic lead information (matching Salesforce format)
+      params.set('first_name', formData.name || '');
+      params.set('last_name', 'Nevys Student');
+      params.set('company', 'Nevy\'s Language Academy');
+      params.set('lead_source', 'Website Landing Page');
+      params.set('status', 'New');
+      
+      // Contact information
+      params.set('email', formData.email || '');
+      params.set('phone', formData.phone || '');
+      params.set('whatsapp_same', formData.whatsappSame || '');
+      params.set('whatsapp_number', formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : (formData.phone || ''));
+      
+      // Form responses
+      params.set('english_lessons_history', formData.englishLessonsHistory || '');
+      params.set('level_preference', formData.levelPreference || '');
+      params.set('availability', formData.availability || '');
+      params.set('specific_time_slot', formData.specificTimeSlot || '');
+      params.set('province', formData.province || '');
+      
       // Facebook campaign tracking data
-      campaignName: formData.campaignName || '',
-      adsetName: formData.adsetName || '',
-      adName: formData.adName || '',
-      fbClickId: formData.fbClickId || '',
-      // Timestamp
-      submittedAt: new Date().toISOString()
-    };
+      params.set('campaign_name', formData.campaignName || '');
+      params.set('adset_name', formData.adsetName || '');
+      params.set('ad_name', formData.adName || '');
+      params.set('fb_click_id', formData.fbClickId || '');
+      
+      // Additional metadata
+      params.set('submission_date', new Date().toISOString());
+      params.set('source_url', window.location.href);
+      
+      // Formatted description for Salesforce
+      params.set('description', this.formatFormDataForDescription(formData));
 
-    // Send to Zapier with proper headers to ensure JSON format
-    this.http.post(zapierWebhookUrl, zapierData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    }).subscribe({
-      next: (response) => {
-        console.log('Data sent to Zapier successfully:', response);
-        
-        // Build confirmation URL with Facebook campaign parameters
-        const confirmationUrl = this.buildConfirmationUrl(formData);
-        
-        // Redirect to confirmation page
-        window.location.href = confirmationUrl;
-      },
-      error: (error) => {
-        console.error('Error sending to Zapier:', error);
-        
-        // Even if Zapier fails, still redirect to confirmation page
-        const confirmationUrl = this.buildConfirmationUrl(formData);
-        window.location.href = confirmationUrl;
-      }
-    });
+      console.log('=== ZAPIER WEBHOOK DEBUG ===');
+      console.log('Webhook URL:', zapierWebhookUrl);
+      console.log('Parameters being sent:', params.toString());
+
+      // Send as GET request with query parameters (matching successful pattern)
+      this.http.get(`${zapierWebhookUrl}?${params.toString()}`).subscribe({
+        next: (response) => {
+          console.log('=== ZAPIER SUCCESS ===');
+          console.log('Data sent to Zapier successfully:', response);
+          
+          // Build confirmation URL with Facebook campaign parameters
+          const confirmationUrl = this.buildConfirmationUrl(formData);
+          
+          // Redirect to confirmation page
+          window.location.href = confirmationUrl;
+        },
+        error: (error) => {
+          console.error('=== ZAPIER ERROR ===');
+          console.error('Error sending to Zapier:', error);
+          
+          // Even if Zapier fails, still redirect to confirmation page
+          const confirmationUrl = this.buildConfirmationUrl(formData);
+          window.location.href = confirmationUrl;
+        }
+      });
+    } catch (error) {
+      console.error('Error preparing Zapier request:', error);
+      
+      // Even if preparation fails, still redirect to confirmation page
+      const confirmationUrl = this.buildConfirmationUrl(formData);
+      window.location.href = confirmationUrl;
+    }
+  }
+
+  // Format form data into a readable description (matching successful pattern)
+  private formatFormDataForDescription(formData: any): string {
+    let description = `Arabic Lead Form Submission Details:\n\n`;
+    
+    description += `Name: ${formData.name || 'Not provided'}\n`;
+    description += `Email: ${formData.email || 'Not provided'}\n`;
+    description += `Phone: ${formData.phone || 'Not provided'}\n`;
+    description += `WhatsApp Same: ${formData.whatsappSame || 'Not provided'}\n`;
+    
+    if (formData.whatsappSame === 'no') {
+      description += `WhatsApp Number: ${this.getFullWhatsAppNumber()}\n`;
+    }
+    
+    description += `English Lessons History: ${formData.englishLessonsHistory || 'Not provided'}\n`;
+    description += `Level Preference: ${formData.levelPreference || 'Not provided'}\n`;
+    description += `Availability: ${formData.availability || 'Not provided'}\n`;
+    description += `Specific Time Slot: ${formData.specificTimeSlot || 'Not provided'}\n`;
+    description += `Province: ${formData.province || 'Not provided'}\n`;
+    
+    // Facebook campaign data
+    if (formData.campaignName) {
+      description += `\nFacebook Campaign Data:\n`;
+      description += `Campaign: ${formData.campaignName}\n`;
+      description += `Adset: ${formData.adsetName || 'Not provided'}\n`;
+      description += `Ad: ${formData.adName || 'Not provided'}\n`;
+      description += `Click ID: ${formData.fbClickId || 'Not provided'}\n`;
+    }
+    
+    description += `\nSubmitted on: ${new Date().toLocaleString()}`;
+    
+    return description;
   }
 
   buildConfirmationUrl(formData: any): string {
