@@ -210,32 +210,37 @@ export class AppComponent implements OnInit {
   }
 
   sendToZapier(formData: any) {
-    // Replace this URL with your actual Zapier webhook URL
-    const zapierWebhookUrl = 'YOUR_ZAPIER_WEBHOOK_URL_HERE';
+    // Your actual Zapier webhook URL
+    const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/4630879/umntccj/';
     
-    // Prepare data for Zapier
+    // Prepare data for Zapier in clean JSON format
     const zapierData = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      whatsappSame: formData.whatsappSame,
-      whatsappNumber: formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : formData.phone,
-      englishLessonsHistory: formData.englishLessonsHistory,
-      levelPreference: formData.levelPreference,
-      availability: formData.availability,
-      specificTimeSlot: formData.specificTimeSlot,
-      province: formData.province,
+      name: formData.name || '',
+      email: formData.email || '',
+      phone: formData.phone || '',
+      whatsappSame: formData.whatsappSame || '',
+      whatsappNumber: formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : (formData.phone || ''),
+      englishLessonsHistory: formData.englishLessonsHistory || '',
+      levelPreference: formData.levelPreference || '',
+      availability: formData.availability || '',
+      specificTimeSlot: formData.specificTimeSlot || '',
+      province: formData.province || '',
       // Facebook campaign tracking data
-      campaignName: formData.campaignName,
-      adsetName: formData.adsetName,
-      adName: formData.adName,
-      fbClickId: formData.fbClickId,
+      campaignName: formData.campaignName || '',
+      adsetName: formData.adsetName || '',
+      adName: formData.adName || '',
+      fbClickId: formData.fbClickId || '',
       // Timestamp
       submittedAt: new Date().toISOString()
     };
 
-    // Send to Zapier
-    this.http.post(zapierWebhookUrl, zapierData).subscribe({
+    // Send to Zapier with proper headers to ensure JSON format
+    this.http.post(zapierWebhookUrl, zapierData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }).subscribe({
       next: (response) => {
         console.log('Data sent to Zapier successfully:', response);
         
