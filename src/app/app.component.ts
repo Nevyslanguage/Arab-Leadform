@@ -241,9 +241,9 @@ export class AppComponent implements OnInit {
       
       // Contact information
       params.set('email', formData.email || '');
-      params.set('phone', formData.phone || '');
+      params.set('phone', this.formatPhoneForSubmission(formData.phone) || '');
       params.set('whatsapp_same', formData.whatsappSame || '');
-      params.set('whatsapp_number', formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : (formData.phone || ''));
+      params.set('whatsapp_number', formData.whatsappSame === 'no' ? this.getFullWhatsAppNumber() : this.formatPhoneForSubmission(formData.phone) || '');
       
       // Form responses
       params.set('english_lessons_history', formData.englishLessonsHistory || '');
@@ -411,14 +411,17 @@ export class AppComponent implements OnInit {
     // Remove all non-digit characters
     const phoneNumber = control.value.replace(/\D/g, '');
     
-    // Canadian phone numbers should be 10 digits (without country code)
-    if (phoneNumber.length === 10) {
+    // Check if it's in the format +1 (xxx) xxx-xxxx (11 digits total with country code)
+    if (phoneNumber.length === 11 && phoneNumber.startsWith('1')) {
+      // Remove the country code to get the 10-digit Canadian number
+      const canadianNumber = phoneNumber.substring(1);
+      
       // Check if it starts with valid Canadian area codes
       const validAreaCodes = [
         '204', '226', '236', '249', '250', '263', '289', '306', '343', '354', '365', '367', '368', '382', '387', '403', '416', '418', '428', '431', '437', '438', '450', '468', '474', '506', '514', '519', '548', '579', '581', '584', '587', '604', '613', '639', '647', '672', '683', '705', '709', '742', '753', '778', '780', '782', '807', '819', '825', '867', '873', '879', '902', '905'
       ];
       
-      const areaCode = phoneNumber.substring(0, 3);
+      const areaCode = canadianNumber.substring(0, 3);
       if (validAreaCodes.includes(areaCode)) {
         return null; // Valid Canadian phone number
       }
@@ -431,10 +434,18 @@ export class AppComponent implements OnInit {
   formatPhoneNumber(event: any) {
     let value = event.target.value.replace(/\D/g, '');
     
+    // Limit to 10 digits (Canadian phone number without country code)
+    if (value.length > 10) {
+      value = value.substring(0, 10);
+    }
+    
+    // Format as +1 (xxx) xxx-xxxx
     if (value.length >= 6) {
-      value = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6, 10);
+      value = `+1 (${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6, 10)}`;
     } else if (value.length >= 3) {
-      value = value.substring(0, 3) + '-' + value.substring(3);
+      value = `+1 (${value.substring(0, 3)}) ${value.substring(3)}`;
+    } else if (value.length > 0) {
+      value = `+1 (${value}`;
     }
     
     this.leadForm.get('phone')?.setValue(value, { emitEvent: false });
@@ -457,6 +468,33 @@ export class AppComponent implements OnInit {
     const countryCode = this.selectedCountryCode;
     const number = this.leadForm.get('whatsappNumber')?.value || '';
     return countryCode + number;
+  }
+
+  // Format phone number for submission (ensure it's in +1 (xxx) xxx-xxxx format)
+  formatPhoneForSubmission(phone: string): string {
+    if (!phone) return '';
+    
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '');
+    
+    // If it's 11 digits and starts with 1, format it
+    if (digits.length === 11 && digits.startsWith('1')) {
+      const areaCode = digits.substring(1, 4);
+      const firstPart = digits.substring(4, 7);
+      const secondPart = digits.substring(7, 11);
+      return `+1 (${areaCode}) ${firstPart}-${secondPart}`;
+    }
+    
+    // If it's 10 digits, add the country code and format
+    if (digits.length === 10) {
+      const areaCode = digits.substring(0, 3);
+      const firstPart = digits.substring(3, 6);
+      const secondPart = digits.substring(6, 10);
+      return `+1 (${areaCode}) ${firstPart}-${secondPart}`;
+    }
+    
+    // Return as is if it doesn't match expected patterns
+    return phone;
   }
 
   // Format email (trim and lowercase)
