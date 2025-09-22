@@ -109,9 +109,9 @@
           <span class="flag">🇨🇦</span>
           <span class="country-code">+1</span>
         </div>
-        <input type="tel" formControlName="phone" class="form-input english-input phone-number-input" placeholder="+1 (xxx) xxx-xxxx" (input)="formatPhoneNumber($event)" (blur)="leadForm.get('phone')?.markAsTouched()">
+        <input type="tel" formControlName="phone" class="form-input english-input phone-number-input" placeholder="(xxx) xxx-xxxx" (input)="formatPhoneNumber($event)" (blur)="leadForm.get('phone')?.markAsTouched()">
       </div>
-      <div class="form-note">يرجى إدخال رقم هاتف كندي صحيح بالتنسيق: +1 (xxx) xxx-xxxx</div>
+      <div class="form-note">يرجى إدخال رقم هاتف كندي صحيح (10 أرقام) - سيتم إرساله بالتنسيق: +1 (xxx) xxx-xxxx</div>
       <div *ngIf="hasFieldErrors('phone')" class="error-message">
         <span *ngFor="let error of getFieldErrors('phone')">{{ error }}</span>
       </div>

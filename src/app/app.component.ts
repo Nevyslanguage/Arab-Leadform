@@ -411,17 +411,14 @@ export class AppComponent implements OnInit {
     // Remove all non-digit characters
     const phoneNumber = control.value.replace(/\D/g, '');
     
-    // Check if it's in the format +1 (xxx) xxx-xxxx (11 digits total with country code)
-    if (phoneNumber.length === 11 && phoneNumber.startsWith('1')) {
-      // Remove the country code to get the 10-digit Canadian number
-      const canadianNumber = phoneNumber.substring(1);
-      
+    // Canadian phone numbers should be 10 digits (without country code)
+    if (phoneNumber.length === 10) {
       // Check if it starts with valid Canadian area codes
       const validAreaCodes = [
         '204', '226', '236', '249', '250', '263', '289', '306', '343', '354', '365', '367', '368', '382', '387', '403', '416', '418', '428', '431', '437', '438', '450', '468', '474', '506', '514', '519', '548', '579', '581', '584', '587', '604', '613', '639', '647', '672', '683', '705', '709', '742', '753', '778', '780', '782', '807', '819', '825', '867', '873', '879', '902', '905'
       ];
       
-      const areaCode = canadianNumber.substring(0, 3);
+      const areaCode = phoneNumber.substring(0, 3);
       if (validAreaCodes.includes(areaCode)) {
         return null; // Valid Canadian phone number
       }
@@ -439,13 +436,13 @@ export class AppComponent implements OnInit {
       value = value.substring(0, 10);
     }
     
-    // Format as +1 (xxx) xxx-xxxx
+    // Format as (xxx) xxx-xxxx (without +1 prefix in the input field)
     if (value.length >= 6) {
-      value = `+1 (${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6, 10)}`;
+      value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6, 10)}`;
     } else if (value.length >= 3) {
-      value = `+1 (${value.substring(0, 3)}) ${value.substring(3)}`;
+      value = `(${value.substring(0, 3)}) ${value.substring(3)}`;
     } else if (value.length > 0) {
-      value = `+1 (${value}`;
+      value = `(${value}`;
     }
     
     this.leadForm.get('phone')?.setValue(value, { emitEvent: false });
