@@ -200,8 +200,8 @@ export class AppComponent implements OnInit {
       // Form responses
       params.set('english_lessons_history', formData.englishLessonsHistory || '');
       params.set('level_preference', formData.levelPreference || '');
-      params.set('availability', formData.availability || '');
-      params.set('specific_time_slot', formData.specificTimeSlot || '');
+      params.set('best_time_to_contact', formData.availability || '');
+      params.set('detailed_contact_time', formData.specificTimeSlot || '');
       params.set('province', formData.province || '');
       
       // Facebook campaign tracking data
@@ -266,8 +266,8 @@ export class AppComponent implements OnInit {
     
     description += `English Lessons History: ${formData.englishLessonsHistory || 'Not provided'}\n`;
     description += `Level Preference: ${formData.levelPreference || 'Not provided'}\n`;
-    description += `Availability: ${formData.availability || 'Not provided'}\n`;
-    description += `Specific Time Slot: ${formData.specificTimeSlot || 'Not provided'}\n`;
+    description += `Best Time to Contact: ${formData.availability || 'Not provided'}\n`;
+    description += `Detailed Contact Time: ${formData.specificTimeSlot || 'Not provided'}\n`;
     description += `Province: ${formData.province || 'Not provided'}\n`;
     
     // Facebook campaign data
