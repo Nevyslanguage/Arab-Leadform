@@ -142,7 +142,7 @@
         <div class="whatsapp-prefix-container">
           <div class="whatsapp-prefix" (click)="toggleCountryDropdown()">
             <span class="flag">{{ getSelectedCountryFlag() }}</span>
-            <span class="country-code">+{{ selectedCountryCode.replace('+', '') }}</span>
+            <span class="country-code">{{ selectedCountryCode }}</span>
             <span class="dropdown-arrow">▼</span>
           </div>
           <div class="country-dropdown" *ngIf="showCountryDropdown">
@@ -178,7 +178,7 @@
         </div>
         <input type="tel" formControlName="whatsappNumber" class="form-input english-input whatsapp-number-input" placeholder="رقم الهاتف بدون رمز الدولة" (input)="formatWhatsAppNumber($event)" (blur)="leadForm.get('whatsappNumber')?.markAsTouched()">
       </div>
-      <div class="form-note">الرقم الكامل: +{{ selectedCountryCode.replace('+', '') }}{{ leadForm.get('whatsappNumber')?.value || 'رقم الهاتف' }}</div>
+      <div class="form-note">الرقم الكامل: {{ selectedCountryCode }}{{ leadForm.get('whatsappNumber')?.value || 'رقم الهاتف' }}</div>
       <div *ngIf="hasFieldErrors('whatsappNumber')" class="error-message">
         <span *ngFor="let error of getFieldErrors('whatsappNumber')">{{ error }}</span>
       </div>
