@@ -191,7 +191,7 @@
     <!-- Email Address -->
     <div class="form-group">
       <label class="form-label">عنوان البريد الإلكتروني*</label>
-      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" dir="rtl" (blur)="formatEmail($event); leadForm.get('email')?.markAsTouched()" required>
+      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" (blur)="formatEmail($event); leadForm.get('email')?.markAsTouched()" required>
       <div class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</div>
       <div *ngIf="hasFieldErrors('email')" class="error-message">
         <span *ngFor="let error of getFieldErrors('email')">{{ error }}</span>
@@ -204,19 +204,19 @@
       <label class="form-label">المقاطعة*</label>
       <select formControlName="province" class="form-select" required (change)="leadForm.get('province')?.markAsTouched()">
         <option value="">...Select ✓</option>
-        <option value="ontario">Ontario</option>
-        <option value="quebec">Quebec</option>
-        <option value="british-columbia">British Columbia</option>
-        <option value="alberta">Alberta</option>
-        <option value="manitoba">Manitoba</option>
-        <option value="saskatchewan">Saskatchewan</option>
-        <option value="nova-scotia">Nova Scotia</option>
-        <option value="new-brunswick">New Brunswick</option>
-        <option value="newfoundland">Newfoundland and Labrador</option>
-        <option value="prince-edward-island">Prince Edward Island</option>
-        <option value="northwest-territories">Northwest Territories</option>
-        <option value="nunavut">Nunavut</option>
-        <option value="yukon">Yukon</option>
+        <option value="Ontario">Ontario</option>
+        <option value="Quebec">Quebec</option>
+        <option value="British Columbia">British Columbia</option>
+        <option value="Alberta">Alberta</option>
+        <option value="Manitoba">Manitoba</option>
+        <option value="Saskatchewan">Saskatchewan</option>
+        <option value="Nova Scotia">Nova Scotia</option>
+        <option value="New Brunswick">New Brunswick</option>
+        <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+        <option value="Prince Edward Island">Prince Edward Island</option>
+        <option value="Northwest Territories">Northwest Territories</option>
+        <option value="Nunavut">Nunavut</option>
+        <option value="Yukon">Yukon</option>
       </select>
       <div *ngIf="hasFieldErrors('province')" class="error-message">
         <span *ngFor="let error of getFieldErrors('province')">{{ error }}</span>
