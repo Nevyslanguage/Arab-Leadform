@@ -73,13 +73,13 @@ export class AppComponent implements OnInit {
   ];
 
   timeSlots = {
-    morning: [
+    '9am-11am': [
       { value: '9:00-9:30', label: '9:00 - 9:30 صباحًا' },
       { value: '9:30-10:00', label: '9:30 - 10:00 صباحًا' },
       { value: '10:30-11:00', label: '10:30 - 11:00 صباحًا' },
       { value: '10:00-10:30', label: '10:00 - 10:30 صباحًا' }
     ],
-    afternoon1: [
+    '11am-2pm': [
       { value: '11:00-11:30', label: '11:00 - 11:30 صباحًا' },
       { value: '11:30-12:00', label: '11:30 - 12:00 ظهرًا' },
       { value: '12:30-1:00', label: '12:30 - 1:00 ظهرًا' },
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
       { value: '1:30-2:00', label: '1:30 - 2:00 ظهرًا' },
       { value: '1:00-1:30', label: '1:00 - 1:30 ظهرًا' }
     ],
-    afternoon2: [
+    '2pm-5pm': [
       { value: '2:30-3:00', label: '2:30 - 3:00 مساءً' },
       { value: '2:00-2:30', label: '2:00 - 2:30 مساءً' },
       { value: '3:30-4:00', label: '3:30 - 4:00 مساءً' },
@@ -95,7 +95,7 @@ export class AppComponent implements OnInit {
       { value: '4:30-5:00', label: '4:30 - 5:00 مساءً' },
       { value: '4:00-4:30', label: '4:00 - 4:30 مساءً' }
     ],
-    evening: [
+    '5pm-9pm': [
       { value: '5:30-6:00', label: '5:30 - 6:00 مساءً' },
       { value: '5:00-5:30', label: '5:00 - 5:30 مساءً' },
       { value: '6:30-7:00', label: '6:30 - 7:00 مساءً' },
@@ -128,6 +128,8 @@ export class AppComponent implements OnInit {
    //changes in availability to update time slots
     this.leadForm.get('availability')?.valueChanges.subscribe(value => {
       this.updateTimeSlots(value);
+      console.log("Time slot value,,....", value);
+      
       // Reset specific time slot when availability changes
       this.leadForm.get('specificTimeSlot')?.setValue('');
     });
@@ -194,6 +196,9 @@ export class AppComponent implements OnInit {
   }
 
   onSubmit() {
+    // Mark all fields as touched to show validation errors
+    this.markAllFieldsAsTouched();
+    
     if (this.leadForm.valid) {
       console.log('Form submitted:', this.leadForm.value);
       
@@ -205,8 +210,18 @@ export class AppComponent implements OnInit {
       
     } else {
       console.log('Form is invalid');
-      alert('يرجى ملء جميع الحقول المطلوبة');
+      // Don't show alert, validation errors will be displayed below fields
     }
+  }
+
+  // Mark all form fields as touched to trigger validation display
+  markAllFieldsAsTouched() {
+    Object.keys(this.leadForm.controls).forEach(key => {
+      const control = this.leadForm.get(key);
+      if (control) {
+        control.markAsTouched();
+      }
+    });
   }
 
   sendToZapier(formData: any) {
@@ -520,5 +535,38 @@ export class AppComponent implements OnInit {
     if (!target.closest('.whatsapp-prefix-container')) {
       this.showCountryDropdown = false;
     }
+  }
+
+  // Check if form is valid for submit button styling
+  isFormValid(): boolean {
+    return this.leadForm.valid;
+  }
+
+  // Get validation errors for display
+  getFieldErrors(fieldName: string): string[] {
+    const field = this.leadForm.get(fieldName);
+    const errors: string[] = [];
+    
+    if (field && field.invalid && (field.dirty || field.touched)) {
+      if (field.errors?.['required']) {
+        errors.push('هذا الحقل مطلوب');
+      }
+      if (field.errors?.['email']) {
+        errors.push('يرجى إدخال بريد إلكتروني صحيح');
+      }
+      if (field.errors?.['invalidEmail']) {
+        errors.push('يرجى إدخال بريد إلكتروني صحيح');
+      }
+      if (field.errors?.['invalidCanadianPhone']) {
+        errors.push('يرجى إدخال رقم هاتف كندي صحيح');
+      }
+    }
+    
+    return errors;
+  }
+
+  // Check if field has errors
+  hasFieldErrors(fieldName: string): boolean {
+    return this.getFieldErrors(fieldName).length > 0;
   }
 }

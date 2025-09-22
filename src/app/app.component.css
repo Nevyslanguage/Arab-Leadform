@@ -118,9 +118,22 @@ html, body {
   box-shadow: 0 0 0 1px rgba(37, 135, 184, 0.2);
 }
 
+.form-input.ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.2);
+}
+
 .form-input::placeholder {
   color: #666;
   text-align: right;
+  direction: rtl;
+}
+
+/* Override for specific English-only placeholders */
+input[placeholder*="(xxx)"]::placeholder,
+input[placeholder*="example@"]::placeholder {
+  text-align: left;
+  direction: ltr;
 }
 
 /* Radio Button Styles */
@@ -201,6 +214,12 @@ html, body {
   order: 1;
 }
 
+/* Radio group validation styling */
+.radio-group.ng-invalid.ng-touched .radio-label {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
 /* Form Note */
 .form-note {
   color: #666;
@@ -228,8 +247,8 @@ html, body {
   background-color: white;
   font-size: 16px;
   color: #333;
-  direction: rtl;
-  text-align: right;
+  direction: ltr;
+  text-align: left;
   box-sizing: border-box;
   margin-top: 5px;
   cursor: pointer;
@@ -253,6 +272,11 @@ html, body {
   border-color: rgba(3, 90, 126, 1);
   background-color: white;
   box-shadow: 0 0 0 1px rgba(3, 90, 126, 0.2);
+}
+
+.form-select.ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.2);
 }
 
 .form-select option {
@@ -301,7 +325,15 @@ html, body {
 }
 
 .english-input::placeholder {
-  text-align: left !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Ensure Arabic placeholders are RTL */
+input[placeholder*="رقم"]::placeholder,
+input[placeholder*="البحث"]::placeholder {
+  text-align: right !important;
+  direction: rtl !important;
 }
 
 /* Phone Input Container */
@@ -349,6 +381,11 @@ html, body {
 .phone-input-container:focus-within {
   border-color: #2587b8;
   box-shadow: 0 0 0 1px rgba(37, 135, 184, 0.2);
+}
+
+.phone-input-container.ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.2);
 }
 
 /* WhatsApp Input Container */
@@ -560,12 +597,32 @@ html, body {
   box-shadow: 0 0 0 1px rgba(37, 135, 184, 0.2);
 }
 
+.whatsapp-input-container.ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.2);
+}
+
 /* Error Messages */
 .error-message {
   color: #dc3545;
   font-size: 14px;
-  margin-top: 5px;
+  margin-top: 8px;
   font-weight: 500;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 8px 12px;
+  direction: rtl;
+  text-align: right;
+}
+
+.error-message span {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.error-message span:last-child {
+  margin-bottom: 0;
 }
 
 /* Form Separators */
@@ -604,6 +661,15 @@ html, body {
 .submit-button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+}
+
+/* Green submit button when form is valid */
+.submit-button-valid {
+  background-color: #28a745 !important;
+}
+
+.submit-button-valid:hover:not(:disabled) {
+  background-color: #218838 !important;
 }
 
 /* Responsive Design */

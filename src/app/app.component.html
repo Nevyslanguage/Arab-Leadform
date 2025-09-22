@@ -20,15 +20,18 @@
     <!-- English Lessons History -->
     <div class="form-group">
       <label class="form-label">هل سبق لك أن أخذت دروس في اللغة الإنجليزية من قبل؟*</label>
-      <div class="radio-group">
+      <div class="radio-group" [class.ng-invalid]="leadForm.get('englishLessonsHistory')?.invalid" [class.ng-touched]="leadForm.get('englishLessonsHistory')?.touched">
         <label class="radio-label">
-          <input type="radio" formControlName="englishLessonsHistory" value="yes" class="radio-input">
+          <input type="radio" formControlName="englishLessonsHistory" value="yes" class="radio-input" (change)="leadForm.get('englishLessonsHistory')?.markAsTouched()">
           <span class="radio-text">نعم</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="englishLessonsHistory" value="no" class="radio-input">
+          <input type="radio" formControlName="englishLessonsHistory" value="no" class="radio-input" (change)="leadForm.get('englishLessonsHistory')?.markAsTouched()">
           <span class="radio-text">لا</span>
         </label>
+      </div>
+      <div *ngIf="hasFieldErrors('englishLessonsHistory')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('englishLessonsHistory')">{{ error }}</span>
       </div>
     </div>
 
@@ -37,13 +40,16 @@
       <label class="form-label">هل تفضل أن تأخذ اختباراً لتحديد مستواك، أم تريد أن تبدأ التعلم من الصفر بسهولة؟*</label>
       <div class="radio-group">
         <label class="radio-label">
-          <input type="radio" formControlName="levelPreference" value="test" class="radio-input">
+          <input type="radio" formControlName="levelPreference" value="test" class="radio-input" (change)="leadForm.get('levelPreference')?.markAsTouched()">
           <span class="radio-text">أريد أن أختبر مستواي</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="levelPreference" value="beginner" class="radio-input">
+          <input type="radio" formControlName="levelPreference" value="beginner" class="radio-input" (change)="leadForm.get('levelPreference')?.markAsTouched()">
           <span class="radio-text">أريد أن أبدأ من الصفر</span>
         </label>
+      </div>
+      <div *ngIf="hasFieldErrors('levelPreference')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('levelPreference')">{{ error }}</span>
       </div>
     </div>
 
@@ -52,55 +58,62 @@
       <label class="form-label">في أي وقت تكون متاحًا؟*</label>
       <div class="radio-group availability-group">
         <label class="radio-label">
-          <input type="radio" formControlName="availability" value="morning" class="radio-input">
+          <input type="radio" formControlName="availability" value="9am-11am" class="radio-input" (change)="leadForm.get('availability')?.markAsTouched()">
           <span class="radio-text">صباحًا 11 - 9</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="availability" value="afternoon1" class="radio-input">
+          <input type="radio" formControlName="availability" value="11am-2pm" class="radio-input" (change)="leadForm.get('availability')?.markAsTouched()">
           <span class="radio-text">ظهرا 2 - 11</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="availability" value="afternoon2" class="radio-input">
+          <input type="radio" formControlName="availability" value="2pm-5pm" class="radio-input" (change)="leadForm.get('availability')?.markAsTouched()">
           <span class="radio-text">مساءً 5 - 2</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="availability" value="evening" class="radio-input">
+          <input type="radio" formControlName="availability" value="5pm-9pm" class="radio-input" (change)="leadForm.get('availability')?.markAsTouched()">
           <span class="radio-text">مساءً 9 - 5</span>
         </label>
       </div>
+      <div *ngIf="hasFieldErrors('availability')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('availability')">{{ error }}</span>
+      </div>
     </div>
-
     <!-- Specific Time Slots -->
     <div class="form-group" *ngIf="selectedTimeSlots.length > 0">
       <label class="form-label">لكي نتمكن من الاتصال بك في أفضل وقت، يرجى اختيار فترة زمنية محددة ضمن النطاق الذي اخترته: *</label>
       <div class="radio-group specific-time-slots">
         <label class="radio-label" *ngFor="let slot of selectedTimeSlots">
-          <input type="radio" formControlName="specificTimeSlot" [value]="slot.value" class="radio-input" dir="rtl">
+          <input type="radio" formControlName="specificTimeSlot" [value]="slot.value" class="radio-input" dir="rtl" (change)="leadForm.get('specificTimeSlot')?.markAsTouched()">
           <span class="radio-text" [innerHTML]="slot.label"></span>
         </label>
+      </div>
+      <div *ngIf="hasFieldErrors('specificTimeSlot')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('specificTimeSlot')">{{ error }}</span>
       </div>
     </div>
 
     <!-- Name Input -->
     <div class="form-group">
       <label class="form-label">اسمك*</label>
-      <input type="text" formControlName="name" class="form-input" required>
+      <input type="text" formControlName="name" class="form-input" required (blur)="leadForm.get('name')?.markAsTouched()">
+      <div *ngIf="hasFieldErrors('name')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('name')">{{ error }}</span>
+      </div>
     </div>
 
     <!-- Phone Number -->
     <div class="form-group">
       <label class="form-label">رقم هاتفك الكندي (احذر من ارتكاب أي خطأ!) ⚠️*</label>
-      <div class="phone-input-container">
+      <div class="phone-input-container" [class.ng-invalid]="leadForm.get('phone')?.invalid" [class.ng-touched]="leadForm.get('phone')?.touched">
         <div class="phone-prefix">
           <span class="flag">🇨🇦</span>
           <span class="country-code">+1</span>
         </div>
-        <input type="tel" formControlName="phone" class="form-input english-input phone-number-input" placeholder="(xxx) xxx-xxxx" (input)="formatPhoneNumber($event)">
+        <input type="tel" formControlName="phone" class="form-input english-input phone-number-input" placeholder="(xxx) xxx-xxxx" (input)="formatPhoneNumber($event)" (blur)="leadForm.get('phone')?.markAsTouched()">
       </div>
       <div class="form-note">يرجى إدخال رقم هاتف كندي صحيح (10 أرقام)</div>
-      <div *ngIf="leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched" class="error-message">
-        <span *ngIf="leadForm.get('phone')?.errors?.['required']">رقم الهاتف مطلوب</span>
-        <span *ngIf="leadForm.get('phone')?.errors?.['invalidCanadianPhone']">يرجى إدخال رقم هاتف كندي صحيح</span>
+      <div *ngIf="hasFieldErrors('phone')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('phone')">{{ error }}</span>
       </div>
     </div>
 
@@ -109,20 +122,23 @@
       <label class="form-label">هل رقم هاتفك هو نفسه رقمك على واتساب ؟*</label>
       <div class="radio-group">
         <label class="radio-label">
-          <input type="radio" formControlName="whatsappSame" value="yes" class="radio-input">
+          <input type="radio" formControlName="whatsappSame" value="yes" class="radio-input" (change)="leadForm.get('whatsappSame')?.markAsTouched()">
           <span class="radio-text">نعم</span>
         </label>
         <label class="radio-label">
-          <input type="radio" formControlName="whatsappSame" value="no" class="radio-input">
+          <input type="radio" formControlName="whatsappSame" value="no" class="radio-input" (change)="leadForm.get('whatsappSame')?.markAsTouched()">
           <span class="radio-text">لا</span>
         </label>
+      </div>
+      <div *ngIf="hasFieldErrors('whatsappSame')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('whatsappSame')">{{ error }}</span>
       </div>
     </div>
 
     <!-- WhatsApp Number Input (conditional) -->
     <div class="form-group" *ngIf="leadForm.get('whatsappSame')?.value === 'no'">
       <label class="form-label">يرجى إدخال رقم واتساب الخاص بك*</label>
-      <div class="whatsapp-input-container">
+      <div class="whatsapp-input-container" [class.ng-invalid]="leadForm.get('whatsappNumber')?.invalid" [class.ng-touched]="leadForm.get('whatsappNumber')?.touched">
         <div class="whatsapp-prefix-container">
           <div class="whatsapp-prefix" (click)="toggleCountryDropdown()">
             <span class="flag">{{ getSelectedCountryFlag() }}</span>
@@ -159,24 +175,25 @@
             </div>
           </div>
         </div>
-        <input type="tel" formControlName="whatsappNumber" class="form-input english-input whatsapp-number-input" placeholder="رقم الهاتف بدون رمز الدولة" (input)="formatWhatsAppNumber($event)">
+        <input type="tel" formControlName="whatsappNumber" class="form-input english-input whatsapp-number-input" placeholder="رقم الهاتف بدون رمز الدولة" (input)="formatWhatsAppNumber($event)" (blur)="leadForm.get('whatsappNumber')?.markAsTouched()">
       </div>
       <div class="form-note">الرقم الكامل: {{ selectedCountryCode }}{{ leadForm.get('whatsappNumber')?.value || 'رقم الهاتف' }}</div>
       <div class="warning-message">
         <span class="warning-icon">⚠️</span>
         <span class="warning-text">يرجى عدم ارتكاب أي خطأ، وإلا فلن نتمكن من التواصل معك</span>
       </div>
+      <div *ngIf="hasFieldErrors('whatsappNumber')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('whatsappNumber')">{{ error }}</span>
+      </div>
     </div>
 
     <!-- Email Address -->
     <div class="form-group">
       <label class="form-label">عنوان البريد الإلكتروني*</label>
-      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" (blur)="formatEmail($event)" required>
+      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" (blur)="formatEmail($event); leadForm.get('email')?.markAsTouched()" required>
       <div class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</div>
-      <div *ngIf="leadForm.get('email')?.invalid && leadForm.get('email')?.touched" class="error-message">
-        <span *ngIf="leadForm.get('email')?.errors?.['required']">البريد الإلكتروني مطلوب</span>
-        <span *ngIf="leadForm.get('email')?.errors?.['email']">يرجى إدخال بريد إلكتروني صحيح</span>
-        <span *ngIf="leadForm.get('email')?.errors?.['invalidEmail']">يرجى إدخال بريد إلكتروني صحيح</span>
+      <div *ngIf="hasFieldErrors('email')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('email')">{{ error }}</span>
       </div>
     </div>
 
@@ -184,22 +201,25 @@
     <div class="form-group">
       <p class="province-intro">نود أن نعرف من أين يأتي طلابنا المحتملون 😊</p>
       <label class="form-label">المقاطعة*</label>
-      <select formControlName="province" class="form-select" required>
+      <select formControlName="province" class="form-select" required (change)="leadForm.get('province')?.markAsTouched()">
         <option value="">...Select ✓</option>
-        <option value="ontario">أونتاريو</option>
-        <option value="quebec">كيبيك</option>
-        <option value="british-columbia">كولومبيا البريطانية</option>
-        <option value="alberta">ألبرتا</option>
-        <option value="manitoba">مانيتوبا</option>
-        <option value="saskatchewan">ساسكاتشوان</option>
-        <option value="nova-scotia">نوفا سكوشا</option>
-        <option value="new-brunswick">نيو برونزويك</option>
-        <option value="newfoundland">نيوفاوندلاند ولابرادور</option>
-        <option value="prince-edward-island">جزيرة الأمير إدوارد</option>
-        <option value="northwest-territories">الأقاليم الشمالية الغربية</option>
-        <option value="nunavut">نونافوت</option>
-        <option value="yukon">يوكون</option>
+        <option value="ontario">Ontario</option>
+        <option value="quebec">Quebec</option>
+        <option value="british-columbia">British Columbia</option>
+        <option value="alberta">Alberta</option>
+        <option value="manitoba">Manitoba</option>
+        <option value="saskatchewan">Saskatchewan</option>
+        <option value="nova-scotia">Nova Scotia</option>
+        <option value="new-brunswick">New Brunswick</option>
+        <option value="newfoundland">Newfoundland and Labrador</option>
+        <option value="prince-edward-island">Prince Edward Island</option>
+        <option value="northwest-territories">Northwest Territories</option>
+        <option value="nunavut">Nunavut</option>
+        <option value="yukon">Yukon</option>
       </select>
+      <div *ngIf="hasFieldErrors('province')" class="error-message">
+        <span *ngFor="let error of getFieldErrors('province')">{{ error }}</span>
+      </div>
     </div>
 
     <!-- Hidden Campaign Tracking Fields (auto-populated from URL) -->
@@ -209,7 +229,7 @@
     <input type="hidden" formControlName="fbClickId">
 
     <!-- Submit Button -->
-    <button type="submit" class="submit-button" [disabled]="leadForm.invalid">
+    <button type="submit" class="submit-button" [class.submit-button-valid]="isFormValid()" [disabled]="leadForm.invalid">
       إرسال النموذج
     </button>
   </form>
