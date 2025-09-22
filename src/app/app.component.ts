@@ -3,6 +3,8 @@ import { RouterOutlet } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { COUNTRIES, Country } from './countries';
+import { getMaxDigitsForCountry } from './country-digit-limits';
 
 @Component({
   selector: 'app-root',
@@ -20,57 +22,7 @@ export class AppComponent implements OnInit {
   countrySearchTerm = '';
   filteredCountries: any[] = [];
 
-  countryCodes = [
-    { code: '+1', country: 'Canada/USA', flag: '🇨🇦' },
-    { code: '+44', country: 'UK', flag: '🇬🇧' },
-    { code: '+33', country: 'France', flag: '🇫🇷' },
-    { code: '+49', country: 'Germany', flag: '🇩🇪' },
-    { code: '+39', country: 'Italy', flag: '🇮🇹' },
-    { code: '+34', country: 'Spain', flag: '🇪🇸' },
-    { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
-    { code: '+46', country: 'Sweden', flag: '🇸🇪' },
-    { code: '+47', country: 'Norway', flag: '🇳🇴' },
-    { code: '+45', country: 'Denmark', flag: '🇩🇰' },
-    { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
-    { code: '+43', country: 'Austria', flag: '🇦🇹' },
-    { code: '+32', country: 'Belgium', flag: '🇧🇪' },
-    { code: '+351', country: 'Portugal', flag: '🇵🇹' },
-    { code: '+30', country: 'Greece', flag: '🇬🇷' },
-    { code: '+90', country: 'Turkey', flag: '🇹🇷' },
-    { code: '+7', country: 'Russia', flag: '🇷🇺' },
-    { code: '+86', country: 'China', flag: '🇨🇳' },
-    { code: '+81', country: 'Japan', flag: '🇯🇵' },
-    { code: '+82', country: 'South Korea', flag: '🇰🇷' },
-    { code: '+91', country: 'India', flag: '🇮🇳' },
-    { code: '+61', country: 'Australia', flag: '🇦🇺' },
-    { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
-    { code: '+55', country: 'Brazil', flag: '🇧🇷' },
-    { code: '+52', country: 'Mexico', flag: '🇲🇽' },
-    { code: '+54', country: 'Argentina', flag: '🇦🇷' },
-    { code: '+56', country: 'Chile', flag: '🇨🇱' },
-    { code: '+57', country: 'Colombia', flag: '🇨🇴' },
-    { code: '+51', country: 'Peru', flag: '🇵🇪' },
-    { code: '+58', country: 'Venezuela', flag: '🇻🇪' },
-    { code: '+27', country: 'South Africa', flag: '🇿🇦' },
-    { code: '+20', country: 'Egypt', flag: '🇪🇬' },
-    { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
-    { code: '+971', country: 'UAE', flag: '🇦🇪' },
-    { code: '+965', country: 'Kuwait', flag: '🇰🇼' },
-    { code: '+973', country: 'Bahrain', flag: '🇧🇭' },
-    { code: '+974', country: 'Qatar', flag: '🇶🇦' },
-    { code: '+968', country: 'Oman', flag: '🇴🇲' },
-    { code: '+962', country: 'Jordan', flag: '🇯🇴' },
-    { code: '+961', country: 'Lebanon', flag: '🇱🇧' },
-    { code: '+963', country: 'Syria', flag: '🇸🇾' },
-    { code: '+964', country: 'Iraq', flag: '🇮🇶' },
-    { code: '+98', country: 'Iran', flag: '🇮🇷' },
-    { code: '+92', country: 'Pakistan', flag: '🇵🇰' },
-    { code: '+880', country: 'Bangladesh', flag: '🇧🇩' },
-    { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
-    { code: '+977', country: 'Nepal', flag: '🇳🇵' },
-    { code: '+975', country: 'Bhutan', flag: '🇧🇹' },
-    { code: '+93', country: 'Afghanistan', flag: '🇦🇫' }
-  ];
+  countryCodes: Country[] = COUNTRIES;
 
   timeSlots = {
     '9am-11am': [
@@ -465,59 +417,7 @@ export class AppComponent implements OnInit {
 
   // Get maximum number of digits allowed for each country code
   getMaxDigitsForCountry(countryCode: string): number {
-    const countryDigitLimits: { [key: string]: number } = {
-      '+1': 10,      // Canada/USA
-      '+44': 10,     // UK
-      '+33': 9,      // France
-      '+49': 11,     // Germany
-      '+39': 10,     // Italy
-      '+34': 9,      // Spain
-      '+31': 9,      // Netherlands
-      '+46': 9,      // Sweden
-      '+47': 8,      // Norway
-      '+45': 8,      // Denmark
-      '+41': 9,      // Switzerland
-      '+43': 10,     // Austria
-      '+32': 9,      // Belgium
-      '+351': 9,     // Portugal
-      '+30': 10,     // Greece
-      '+90': 10,     // Turkey
-      '+7': 10,      // Russia
-      '+86': 11,     // China
-      '+81': 10,     // Japan
-      '+82': 10,     // South Korea
-      '+91': 10,     // India
-      '+61': 9,      // Australia
-      '+64': 8,      // New Zealand
-      '+55': 11,     // Brazil
-      '+52': 10,     // Mexico
-      '+54': 10,     // Argentina
-      '+56': 8,      // Chile
-      '+57': 10,     // Colombia
-      '+51': 9,      // Peru
-      '+58': 10,     // Venezuela
-      '+27': 9,      // South Africa
-      '+20': 10,     // Egypt
-      '+966': 9,     // Saudi Arabia
-      '+971': 9,     // UAE
-      '+965': 8,     // Kuwait
-      '+973': 8,     // Bahrain
-      '+974': 8,     // Qatar
-      '+968': 8,     // Oman
-      '+962': 9,     // Jordan
-      '+961': 8,     // Lebanon
-      '+963': 9,     // Syria
-      '+964': 10,    // Iraq
-      '+98': 10,     // Iran
-      '+92': 10,     // Pakistan
-      '+880': 10,    // Bangladesh
-      '+94': 9,      // Sri Lanka
-      '+977': 10,    // Nepal
-      '+975': 8,     // Bhutan
-      '+93': 9       // Afghanistan
-    };
-    
-    return countryDigitLimits[countryCode] || 15; // Default to 15 if country not found
+    return getMaxDigitsForCountry(countryCode);
   }
 
   // Get full WhatsApp number with country code
