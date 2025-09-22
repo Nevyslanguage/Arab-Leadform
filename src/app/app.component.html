@@ -151,6 +151,7 @@
                      class="country-search-input" 
                      placeholder="البحث عن الدول..." 
                      [(ngModel)]="countrySearchTerm"
+                     [ngModelOptions]="{standalone: true}"
                      (input)="onCountrySearch($event)"
                      (keyup)="onCountrySearch($event)"
                      (paste)="onCountrySearch($event)"
@@ -190,7 +191,7 @@
     <!-- Email Address -->
     <div class="form-group">
       <label class="form-label">عنوان البريد الإلكتروني*</label>
-      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" (blur)="formatEmail($event); leadForm.get('email')?.markAsTouched()" required>
+      <input type="email" formControlName="email" class="form-input" placeholder="example@email.com" dir="rtl" (blur)="formatEmail($event); leadForm.get('email')?.markAsTouched()" required>
       <div class="form-note">إذا لم نتمكن من الوصول إليك عبر الهاتف، سنحاول الاتصال بك عبر البريد الإلكتروني.</div>
       <div *ngIf="hasFieldErrors('email')" class="error-message">
         <span *ngFor="let error of getFieldErrors('email')">{{ error }}</span>

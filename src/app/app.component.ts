@@ -452,12 +452,72 @@ export class AppComponent implements OnInit {
   formatWhatsAppNumber(event: any) {
     let value = event.target.value.replace(/\D/g, '');
     
-    // Limit to reasonable length (15 digits max for international numbers)
-    if (value.length > 15) {
-      value = value.substring(0, 15);
+    // Get the maximum allowed digits for the selected country
+    const maxDigits = this.getMaxDigitsForCountry(this.selectedCountryCode);
+    
+    // Limit to the maximum allowed digits for the selected country
+    if (value.length > maxDigits) {
+      value = value.substring(0, maxDigits);
     }
     
     this.leadForm.get('whatsappNumber')?.setValue(value, { emitEvent: false });
+  }
+
+  // Get maximum number of digits allowed for each country code
+  getMaxDigitsForCountry(countryCode: string): number {
+    const countryDigitLimits: { [key: string]: number } = {
+      '+1': 10,      // Canada/USA
+      '+44': 10,     // UK
+      '+33': 9,      // France
+      '+49': 11,     // Germany
+      '+39': 10,     // Italy
+      '+34': 9,      // Spain
+      '+31': 9,      // Netherlands
+      '+46': 9,      // Sweden
+      '+47': 8,      // Norway
+      '+45': 8,      // Denmark
+      '+41': 9,      // Switzerland
+      '+43': 10,     // Austria
+      '+32': 9,      // Belgium
+      '+351': 9,     // Portugal
+      '+30': 10,     // Greece
+      '+90': 10,     // Turkey
+      '+7': 10,      // Russia
+      '+86': 11,     // China
+      '+81': 10,     // Japan
+      '+82': 10,     // South Korea
+      '+91': 10,     // India
+      '+61': 9,      // Australia
+      '+64': 8,      // New Zealand
+      '+55': 11,     // Brazil
+      '+52': 10,     // Mexico
+      '+54': 10,     // Argentina
+      '+56': 8,      // Chile
+      '+57': 10,     // Colombia
+      '+51': 9,      // Peru
+      '+58': 10,     // Venezuela
+      '+27': 9,      // South Africa
+      '+20': 10,     // Egypt
+      '+966': 9,     // Saudi Arabia
+      '+971': 9,     // UAE
+      '+965': 8,     // Kuwait
+      '+973': 8,     // Bahrain
+      '+974': 8,     // Qatar
+      '+968': 8,     // Oman
+      '+962': 9,     // Jordan
+      '+961': 8,     // Lebanon
+      '+963': 9,     // Syria
+      '+964': 10,    // Iraq
+      '+98': 10,     // Iran
+      '+92': 10,     // Pakistan
+      '+880': 10,    // Bangladesh
+      '+94': 9,      // Sri Lanka
+      '+977': 10,    // Nepal
+      '+975': 8,     // Bhutan
+      '+93': 9       // Afghanistan
+    };
+    
+    return countryDigitLimits[countryCode] || 15; // Default to 15 if country not found
   }
 
   // Get full WhatsApp number with country code
@@ -521,6 +581,19 @@ export class AppComponent implements OnInit {
     this.selectedCountryCode = country.code;
     this.showCountryDropdown = false;
     this.countrySearchTerm = '';
+    
+    // Re-format WhatsApp number if it exists and exceeds the new country's limit
+    const currentWhatsAppNumber = this.leadForm.get('whatsappNumber')?.value || '';
+    if (currentWhatsAppNumber) {
+      const digits = currentWhatsAppNumber.replace(/\D/g, '');
+      const maxDigits = this.getMaxDigitsForCountry(country.code);
+      
+      if (digits.length > maxDigits) {
+        const trimmedDigits = digits.substring(0, maxDigits);
+        this.leadForm.get('whatsappNumber')?.setValue(trimmedDigits, { emitEvent: false });
+      }
+    }
+    
     console.log('Country selected:', country);
   }
 
